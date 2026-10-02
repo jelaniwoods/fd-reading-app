@@ -42,6 +42,10 @@ Rails.application.configure do
     config.action_controller.forgery_protection_origin_check = false
   end
 
+  # Admit Cloudflare quick-tunnel hosts (https://RANDOM.trycloudflare.com) so a
+  # remote native preview, such as Revyl, can reach this development server.
+  config.hosts << ".trycloudflare.com"
+
   # Enable/disable Action Controller caching. By default Action Controller caching is disabled.
   # Run rails dev:cache to toggle Action Controller caching.
   if Rails.root.join("tmp/caching-dev.txt").exist?

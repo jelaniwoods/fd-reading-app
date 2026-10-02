@@ -27,7 +27,7 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body class="min-h-screen bg-background text-foreground" data-hotwire-native-app="<%= hotwire_native_app? %>">
+  <body class="app-backdrop min-h-screen text-foreground" data-hotwire-native-app="<%= hotwire_native_app? %>">
     <%= link_to t("nav.skip_to_content"), "#main-content", class: "sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded focus:bg-background focus:p-3" %>
 
     <% unless hotwire_native_app? %>

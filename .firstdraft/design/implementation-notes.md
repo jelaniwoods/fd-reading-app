@@ -9,12 +9,16 @@
   make sure the New form shows Finished unchecked and that a record created without the value stores `false`
   (for example, a migration column default plus a model default).
   - Example: open New Book, enter only Title and Author, save → the book shows Finished: No.
-  - Verified 2026-10-02: the New form renders Finished unchecked and saving it stores `false`. Still open: the
-    `books.finished` column has no database default and `Book.new.finished` is `nil`, so non-form creates that
-    omit the value fail validation.
+  - Done 2026-10-02: the New form renders Finished unchecked, and migration
+    `20261002152932_change_books_finished_default` gives `books.finished` a `false` database default, so
+    `Book.new.finished` is `false` and creates that omit the value store `false` (covered in
+    `spec/models/book_spec.rb`). `.firstdraft/gaps.json` is the retained analysis record and is left unchanged.
 - The Books list shows each book's Author and Finished status beside its Title. The analyzer warned about the
   index projection, but the generated list already renders all three (verified 2026-10-02).
-- Not to be published to GitHub or deployed as part of the initial build.
+- Later decision (2026-10-02): the source is in public GitHub repository `jelaniwoods/fd-reading-app` and deploys to
+  Render (free web service, auto-deploy on commit) with a Neon Postgres 18 database in AWS us-east-2.
+- The page background uses a subtle geometric (diamond lattice) pattern drawn from theme tokens
+  (`.app-backdrop` in `app/assets/stylesheets/application.tailwind.css`); cards and the header stay solid.
 
 ## Open questions
 

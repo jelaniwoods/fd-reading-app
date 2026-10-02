@@ -8,6 +8,15 @@
 @custom-variant hotwire-native (&:where(body[data-hotwire-native-app="true"] *));
 
 @layer components {
+  /* Page backdrop: a fine diamond lattice drawn from the theme's own tokens, so it
+     follows every palette. Cards and the header keep solid surfaces for reading. */
+  .app-backdrop {
+    --backdrop-ink: color-mix(in oklch, var(--foreground) 7%, transparent);
+    background-color: var(--background);
+    background-image:
+      repeating-linear-gradient(45deg, var(--backdrop-ink) 0 1px, transparent 1px 22px),
+      repeating-linear-gradient(-45deg, var(--backdrop-ink) 0 1px, transparent 1px 22px);
+  }
   .app-shell {
     @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
   }
