@@ -1,0 +1,145 @@
+{
+  "format": "firstdraft.foundation-plan.sketch/0.23",
+  "target": {
+    "id": "rails",
+    "profile": "rails-sketch/2026-09-bookmark-assets"
+  },
+  "application": {
+    "key": "reading_list",
+    "name": "Reading List",
+    "home_index": "book",
+    "native": {
+      "ios": {},
+      "android": {}
+    },
+    "delivery": {},
+    "entities": [
+      {
+        "subject_uuid": "01a0fd25-6b01-7bcb-979c-4c1ab9fe12a9",
+        "key": "book",
+        "name": "Book",
+        "icon": "bookmark",
+        "primary_descriptor": {
+          "field": "book.title"
+        },
+        "fields": [
+          {
+            "subject_uuid": "01a0fd25-6b02-7861-a23c-428960fcdd9a",
+            "key": "title",
+            "name": "Title",
+            "type": "short_text",
+            "required": true
+          },
+          {
+            "subject_uuid": "01a0fd25-6b02-77d2-85fb-17614b5f8d36",
+            "key": "author",
+            "name": "Author",
+            "type": "short_text",
+            "required": true
+          },
+          {
+            "subject_uuid": "01a0fd25-6b02-730d-9df9-822f6fc152a0",
+            "key": "note",
+            "name": "Note",
+            "type": "long_text",
+            "required": false
+          },
+          {
+            "subject_uuid": "01a0fd25-6b02-7f78-a88c-480ed7b77958",
+            "key": "finished",
+            "name": "Finished",
+            "type": "boolean",
+            "required": true,
+            "default": {
+              "kind": "literal",
+              "value": false
+            }
+          }
+        ],
+        "scaffold": {
+          "resource_routes": [
+            "index",
+            "show",
+            "new",
+            "create",
+            "edit",
+            "update",
+            "destroy"
+          ],
+          "index": {
+            "authorization": "public",
+            "projection": [
+              { "field": "book.title" },
+              { "field": "book.author" },
+              { "field": "book.finished" }
+            ]
+          },
+          "show": {
+            "authorization": "public",
+            "projection": [
+              { "field": "book.title" },
+              { "field": "book.author" },
+              { "field": "book.note" },
+              { "field": "book.finished" }
+            ]
+          },
+          "create": {
+            "inputs": [
+              { "field": "book.title" },
+              { "field": "book.author" },
+              { "field": "book.note" },
+              { "field": "book.finished" }
+            ],
+            "authorization": "public"
+          },
+          "update": {
+            "inputs": [
+              { "field": "book.title" },
+              { "field": "book.author" },
+              { "field": "book.note" },
+              { "field": "book.finished" }
+            ],
+            "authorization": "public"
+          },
+          "destroy": {
+            "authorization": "public"
+          }
+        }
+      }
+    ],
+    "development_data": [
+      {
+        "subject_uuid": "01a0fd25-6b02-73e6-ba12-f2a3b87606a0",
+        "key": "left_hand_of_darkness",
+        "entity": "book",
+        "fields": [
+          { "field": "book.title", "value": { "kind": "literal", "value": "The Left Hand of Darkness" } },
+          { "field": "book.author", "value": { "kind": "literal", "value": "Ursula K. Le Guin" } },
+          { "field": "book.note", "value": { "kind": "literal", "value": "Recommended by the book club." } },
+          { "field": "book.finished", "value": { "kind": "literal", "value": true } }
+        ]
+      },
+      {
+        "subject_uuid": "01a0fd25-6b02-7c6f-a798-57e68c60a9fc",
+        "key": "beloved",
+        "entity": "book",
+        "fields": [
+          { "field": "book.title", "value": { "kind": "literal", "value": "Beloved" } },
+          { "field": "book.author", "value": { "kind": "literal", "value": "Toni Morrison" } },
+          { "field": "book.finished", "value": { "kind": "literal", "value": false } }
+        ]
+      },
+      {
+        "subject_uuid": "01a0fd25-6b03-7c34-9901-70db726f30d8",
+        "key": "project_hail_mary",
+        "entity": "book",
+        "fields": [
+          { "field": "book.title", "value": { "kind": "literal", "value": "Project Hail Mary" } },
+          { "field": "book.author", "value": { "kind": "literal", "value": "Andy Weir" } },
+          { "field": "book.note", "value": { "kind": "literal", "value": "Halfway through; great audiobook." } },
+          { "field": "book.finished", "value": { "kind": "literal", "value": false } }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+suffix="${GITHUB_RUN_ID:-local}-${GITHUB_RUN_ATTEMPT:-0}-$$"
+image="rails-app-production-smoke:${suffix}"
+network="rails-app-smoke-${suffix}"
+database="rails-app-smoke-db-${suffix}"
+app="rails-app-smoke-web-${suffix}"
+postgres_image="${POSTGRES_IMAGE:-postgres:18}"
+
+cleanup() {
+  status=$?
+  trap - EXIT INT TERM
+  if (( status != 0 )) && docker inspect "${app}" >/dev/null 2>&1; then
+    echo "Production container logs:" >&2
+    docker logs "${app}" >&2 || true
+  fi
+  docker rm --force --volumes "${app}" "${database}" >/dev/null 2>&1 || true
+  docker network rm "${network}" >/dev/null 2>&1 || true
+  docker image rm "${image}" >/dev/null 2>&1 || true
+  exit "${status}"
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+wait_for_health() {
+  container=$1
+  attempts=$2
+  for ((attempt = 1; attempt <= attempts; attempt++)); do
+    health="$(docker inspect --format '{{if ne .State.Status "running"}}{{.State.Status}}{{else if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "${container}")"
+    [[ "${health}" == "healthy" ]] && return 0
+    [[ "${health}" == "exited" || "${health}" == "dead" || "${health}" == "unhealthy" ]] && return 1
+    sleep 1
+  done
+  return 1
+}
+
+assert_http_status() {
+  expected=$1
+  url=$2
+  shift 2
+  actual="$(curl --silent --show-error --connect-timeout 5 --max-time 10 --output /dev/null --write-out '%{http_code}' "$@" "${url}")"
+  [[ "${actual}" == "${expected}" ]] || {
+    echo "Expected HTTP ${expected} from ${url}, got ${actual}" >&2
+    return 1
+  }
+}
+
+cd "${root}"
+bin/package-manager-check
+docker build --tag "${image}" .
+
+docker network create "${network}" >/dev/null
+docker run --detach --name "${database}" --network "${network}" \
+  --env POSTGRES_USER=postgres \
+  --env POSTGRES_PASSWORD=postgres \
+  --env POSTGRES_DB=app_production \
+  --health-cmd='pg_isready -U postgres -d app_production' \
+  --health-interval=1s --health-timeout=3s --health-retries=30 \
+  "${postgres_image}" >/dev/null
+wait_for_health "${database}" 45 || { docker logs "${database}" >&2; exit 1; }
+
+database_url="postgres://postgres:postgres@${database}:5432/app_production"
+docker run --detach --name "${app}" --network "${network}" --publish 127.0.0.1::80 \
+  --env DATABASE_URL="${database_url}" \
+  --env SECRET_KEY_BASE="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" \
+  "${image}" >/dev/null
+wait_for_health "${app}" 120 || exit 1
+
+runtime_user="$(docker exec "${app}" id -u)"
+[[ "${runtime_user}" != "0" ]] || { echo "Production image runs as root" >&2; exit 1; }
+docker exec "${app}" bin/rails db:abort_if_pending_migrations
+
+host_port="$(docker port "${app}" 80/tcp | head -1 | awk -F: '{print $NF}')"
+base_url="http://127.0.0.1:${host_port}"
+assert_http_status 200 "${base_url}/up"
+assert_http_status 200 "${base_url}/ready"
+
+echo "Production image booted as non-root; database preparation, /up, and /ready passed"

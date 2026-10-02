@@ -1,0 +1,30 @@
+{
+  "format": "firstdraft.foundation-gaps/2",
+  "source": {
+    "sha256": "62fe3486d6e9d61d32c16d410c6cdbb066f21d97b5a60728eea934cec7ed86b4"
+  },
+  "project": {
+    "id": "01a0fd25-6979-7e31-9371-5fea0b2654c3",
+    "graph_version": 1
+  },
+  "analysis": {
+    "release": "foundation-plan-rails/application-2026-09-29-skipped-data-defaults"
+  },
+  "compiler_release": "foundation-plan-rails/compiler-application-2026-09-29-skipped-data-defaults",
+  "target": {
+    "id": "rails",
+    "profile": "rails-sketch/2026-09-bookmark-assets"
+  },
+  "gaps": [
+    {
+      "classification": "target_support_gap",
+      "code": "foundation_plan.gap.field_modifier.default",
+      "kind": "field_modifier",
+      "status": "partially_generated",
+      "pointer": "/application/entities/0/fields/3/default",
+      "readable_path": "book.finished",
+      "reason": "The current release does not realize this authored Field modifier.",
+      "consequence": "the authored default is not applied"
+    }
+  ]
+}

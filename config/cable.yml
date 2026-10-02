@@ -1,0 +1,19 @@
+# Async adapter only works within the same process, so for manually triggering cable updates from a console,
+# and seeing results in the browser, you must do so from the web console (running inside the dev process),
+# not a terminal started via bin/rails console! Add "console" to any action or any ERB template view
+# to make the web console appear.
+development:
+  adapter: async
+
+test:
+  adapter: test
+
+# Cable starts its database listener on subscription. A longer polling interval
+# reduces idle query traffic at the cost of broadcast latency. Tune it for the
+# application's needs and actual network path; a same-region external database
+# does not by itself avoid Render bandwidth charges. See
+# DEPLOY.md#queue-and-cable-polling-is-metered-bandwidth.
+production:
+  adapter: solid_cable
+  polling_interval: <%= ENV.fetch("SOLID_CABLE_POLL_INTERVAL", 1) %>.seconds
+  message_retention: 1.day

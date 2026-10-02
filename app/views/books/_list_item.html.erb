@@ -1,0 +1,21 @@
+<%# locals: (book:, dom_prefix: :list) %>
+<li id="<%= dom_id(book, dom_prefix) %>" class="@container">
+  <div class="item record-list-item">
+    <section>
+      <dl class="record-details record-list-details grid grid-cols-1 gap-3 space-y-0 @md:grid-cols-3">
+        <div>
+          <dt><%= Book.human_attribute_name(:title) %></dt>
+          <dd class="whitespace-pre-wrap"><%= link_to book.title, book_path(book), class: "record-link" %></dd>
+        </div>
+        <div>
+          <dt><%= Book.human_attribute_name(:author) %></dt>
+          <dd class="whitespace-pre-wrap"><%= book.author %></dd>
+        </div>
+        <div>
+          <dt><%= Book.human_attribute_name(:finished) %></dt>
+          <dd class="whitespace-pre-wrap"><%= (book.finished).then { |display_value| case display_value when true then t("shared.values.boolean.true") when false then t("shared.values.boolean.false") else t("shared.values.missing") end } %></dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+</li>

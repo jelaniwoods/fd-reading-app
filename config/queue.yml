@@ -1,0 +1,29 @@
+# Queue polls generate idle database traffic. Production trades pickup latency
+# for fewer queries against this profile's external database; Render meters that
+# outgoing traffic. Tune the intervals for the application's latency and network
+# costs. See DEPLOY.md#queue-and-cable-polling-is-metered-bandwidth.
+default: &default
+  dispatchers:
+    - polling_interval: 1
+      batch_size: 500
+  workers:
+    - queues: "*"
+      threads: 3
+      processes: <%= ENV.fetch("JOB_CONCURRENCY", 1) %>
+      polling_interval: 0.1
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  dispatchers:
+    - polling_interval: <%= ENV.fetch("SOLID_QUEUE_DISPATCH_INTERVAL", 5) %>
+      batch_size: 500
+  workers:
+    - queues: "*"
+      threads: 3
+      processes: <%= ENV.fetch("JOB_CONCURRENCY", 1) %>
+      polling_interval: <%= ENV.fetch("SOLID_QUEUE_POLL_INTERVAL", 5) %>
